@@ -1,117 +1,119 @@
 import React, { useState, useEffect } from 'react';
 import './ProcessingScreen.css';
 
+const ProgressStep = ({ label, status, time }) => {
+  return (
+    <div className={`progress-step ${status}`}>
+      <div className="step-indicator">
+        {status === 'complete' && (
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8l3 3 7-7" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {status === 'active' && (
+          <div className="spinner-small"></div>
+        )}
+        {status === 'pending' && <div className="pending-dot"></div>}
+      </div>
+      <div className="step-content">
+        <span className="step-label">{label}</span>
+        <span className="step-time">{time}</span>
+      </div>
+    </div>
+  );
+};
+
 const ProcessingScreen = ({ onComplete }) => {
-  const [progress, setProgress] = useState(0);
-  const [currentStage, setCurrentStage] = useState(0);
+  const [analysisStage, setAnalysisStage] = useState(-1);
 
   const stages = [
-    { name: 'Initializing Analysis Pipeline', duration: 1000 },
-    { name: 'Loading Medical Image Data', duration: 1200 },
-    { name: 'Preprocessing NIfTI/DICOM Files', duration: 1500 },
-    { name: 'Constructing 3D Volumetric Model', duration: 1800 },
-    { name: 'Identifying Kidney Structures', duration: 1400 },
-    { name: 'Detecting Tumor Regions', duration: 1600 },
-    { name: 'Calculating GFR from Creatinine', duration: 1000 },
-    { name: 'Analyzing Kidney Function', duration: 1200 },
-    { name: 'Computing Dosage Recommendations', duration: 1000 },
-    { name: 'Finalizing Results', duration: 800 }
+    { name: 'Image Processing', duration: 800 },
+    { name: 'AI Segmentation', duration: 2100 },
+    { name: 'Volumetric Analysis', duration: 500 },
+    { name: 'Dose Calculation', duration: 300 }
   ];
 
   useEffect(() => {
-    let timer;
-    let stageTimer;
     const totalDuration = stages.reduce((sum, stage) => sum + stage.duration, 0);
-    let elapsedTime = 0;
-
-    const updateProgress = () => {
-      elapsedTime += 50;
-      const newProgress = Math.min((elapsedTime / totalDuration) * 100, 100);
-      setProgress(newProgress);
-
-      // Update current stage
+    let elapsed = 0;
+    
+    const timer = setInterval(() => {
+      elapsed += 50;
+      
+      // Determine current stage
       let cumulativeTime = 0;
+      let newStage = -1;
       for (let i = 0; i < stages.length; i++) {
         cumulativeTime += stages[i].duration;
-        if (elapsedTime < cumulativeTime) {
-          setCurrentStage(i);
+        if (elapsed >= cumulativeTime - stages[i].duration && elapsed < cumulativeTime) {
+          newStage = i;
           break;
         }
       }
-
-      if (newProgress >= 100) {
-        setTimeout(() => onComplete(), 500);
+      if (elapsed >= totalDuration) {
+        newStage = stages.length - 1;
       }
-    };
+      
+      setAnalysisStage(newStage);
+      
+      if (elapsed >= totalDuration + 500) {
+        clearInterval(timer);
+        onComplete();
+      }
+    }, 50);
 
-    timer = setInterval(updateProgress, 50);
-
-    return () => {
-      clearInterval(timer);
-      if (stageTimer) clearTimeout(stageTimer);
-    };
+    return () => clearInterval(timer);
   }, [onComplete]);
 
   return (
     <div className="processing-screen">
       <div className="grid-background"></div>
       
-      <div className="processing-container">
-        <div className="processing-header">
-          <div className="scan-animation">
-            <div className="scan-line"></div>
-            <div className="kidney-outline">
-              <div className="kidney-left"></div>
-              <div className="kidney-right"></div>
+      <div className="processing-container-new">
+        <div className="processing-card">
+          <div className="spinner-container">
+            <div className="spinner-ring"></div>
+            <div className="spinner-border"></div>
+          </div>
+          
+          <h2 className="processing-title-new">Analyzing Scan</h2>
+          <p className="processing-subtitle">Processing medical imaging data</p>
+
+          <div className="steps-container">
+            <ProgressStep 
+              label="Image Processing" 
+              status={analysisStage >= 0 ? (analysisStage > 0 ? 'complete' : 'active') : 'pending'}
+              time="0.8s"
+            />
+            <ProgressStep 
+              label="AI Segmentation" 
+              status={analysisStage >= 1 ? (analysisStage > 1 ? 'complete' : 'active') : 'pending'}
+              time="2.1s"
+            />
+            <ProgressStep 
+              label="Volumetric Analysis" 
+              status={analysisStage >= 2 ? (analysisStage > 2 ? 'complete' : 'active') : 'pending'}
+              time="0.5s"
+            />
+            <ProgressStep 
+              label="Dose Calculation" 
+              status={analysisStage >= 3 ? 'complete' : (analysisStage === 3 ? 'active' : 'pending')}
+              time="0.3s"
+            />
+          </div>
+
+          <div className="ai-progress-section">
+            <div className="ai-progress-header">
+              <span className="ai-model-label">AI Model: TotalSegmentator v2.0</span>
+              <span className="ai-percentage">{Math.round(((analysisStage + 1) / 4) * 100)}%</span>
+            </div>
+            <div className="ai-progress-bar-bg">
+              <div 
+                className="ai-progress-bar-fill"
+                style={{ width: `${((analysisStage + 1) / 4) * 100}%` }}
+              />
             </div>
           </div>
-          <h1 className="processing-title">Analyzing Medical Data</h1>
-        </div>
-
-        <div className="processing-stages">
-          {stages.map((stage, index) => (
-            <div 
-              key={index} 
-              className={`stage-item ${index <= currentStage ? 'active' : ''} ${index < currentStage ? 'completed' : ''}`}
-            >
-              <div className="stage-indicator">
-                {index < currentStage ? '✓' : index === currentStage ? '⟳' : '○'}
-              </div>
-              <span className="stage-name">{stage.name}</span>
-              {index === currentStage && <span className="stage-spinner"></span>}
-            </div>
-          ))}
-        </div>
-
-        <div className="progress-section">
-          <div className="progress-bar-container">
-            <div className="progress-bar" style={{ width: `${progress}%` }}>
-              <div className="progress-glow"></div>
-            </div>
-          </div>
-          <div className="progress-text">{Math.round(progress)}% Complete</div>
-        </div>
-
-        <div className="processing-stats">
-          <div className="stat-item">
-            <div className="stat-value">{currentStage + 1}/{stages.length}</div>
-            <div className="stat-label">Processing Stage</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{Math.round((10000 - (progress * 100)))}</div>
-            <div className="stat-label">Data Points Analyzed</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{(10 - (progress / 10)).toFixed(1)}s</div>
-            <div className="stat-label">Est. Time Remaining</div>
-          </div>
-        </div>
-
-        <div className="technical-readout">
-          <div className="readout-line">» Neural network inference: Active</div>
-          <div className="readout-line">» GPU acceleration: Enabled</div>
-          <div className="readout-line">» Image resolution: 512x512x256 voxels</div>
-          <div className="readout-line">» Segmentation confidence: {(85 + progress / 10).toFixed(1)}%</div>
         </div>
       </div>
     </div>

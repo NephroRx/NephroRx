@@ -4,9 +4,10 @@ import './AboutPage.css';
 const AboutPage = ({ onClose }) => {
   return (
     <div className="about-overlay">
+      <div className="grid-background"></div>
+      <button className="close-button" onClick={onClose}>×</button>
+      
       <div className="about-container">
-        <button className="close-button" onClick={onClose}>×</button>
-        
         <h1 className="about-title">About NephroRx</h1>
         
         <div className="about-content">
