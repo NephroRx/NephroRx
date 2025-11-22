@@ -8,3 +8,4 @@ backend/venv/
 *.dcm
 backend/nii/
 
+backend/__pycache__/

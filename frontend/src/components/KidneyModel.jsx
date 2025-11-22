@@ -29,7 +29,7 @@ export default function KidneyModel({ mesh }) {
   return (
     <mesh geometry={geometry} scale={0.05}>
       <meshPhysicalMaterial
-        color="#00ff88"
+        color="#FA2A55"
         roughness={0.2}
         metalness={0.1}
         clearcoat={1.0}

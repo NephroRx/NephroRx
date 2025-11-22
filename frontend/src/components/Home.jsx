@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Upload, Activity, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import AboutButton from './About.jsx';
 
 export default function NephroRX() {
   const [scrolled, setScrolled] = useState(0);
@@ -34,7 +35,6 @@ export default function NephroRX() {
       uploadData.append("file", file);
     }
 
-    // Add creatinine
     uploadData.append("creatinine_mg_dl", formData.creatinine || "1.0");
 
     try {
@@ -178,8 +178,11 @@ export default function NephroRX() {
     <div className="bg-[#121212] text-white min-h-screen relative overflow-hidden">
       {/* 3D Cubes Canvas Background */}
       <canvas ref={canvasRef} className="fixed inset-0 z-0" />
-
+      
       <div className="relative z-10">
+        {/* About Button */}
+        <AboutButton />
+
         {/* Hero Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 relative">
           <div
@@ -352,9 +355,8 @@ export default function NephroRX() {
 
         {/* Footer */}
         <footer className="border-t border-[#8B7462]/10 px-6 py-12 mt-20">
-          <div className="max-w-7xl mx-auto text-center text-zinc-700 text-xs font-light tracking-wide">
-            <p>NephroRX © 2024</p>
-            <p className="mt-2">For research and educational purposes only</p>
+          <div className="max-w-7xl mx-auto text-center text-zinc-700 text-s font-bold tracking-wide">
+            <p className="mt-2">For Hackathon please don't use these values.</p>
           </div>
         </footer>
       </div>
