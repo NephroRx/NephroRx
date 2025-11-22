@@ -1,0 +1,433 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: #0a0f1e;
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+/* 3D Grid Background */
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-color: transparent;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 49px,
+      rgba(0, 188, 212, 0.15) 49px,
+      rgba(0, 188, 212, 0.15) 50px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 49px,
+      rgba(0, 188, 212, 0.15) 49px,
+      rgba(0, 188, 212, 0.15) 50px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 9px,
+      rgba(0, 188, 212, 0.08) 9px,
+      rgba(0, 188, 212, 0.08) 10px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 9px,
+      rgba(0, 188, 212, 0.08) 9px,
+      rgba(0, 188, 212, 0.08) 10px
+    );
+  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+  transform: perspective(800px) rotateX(65deg) scale(1.5);
+  transform-origin: center top;
+  animation: gridPulse 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes gridPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: perspective(800px) rotateX(65deg) scale(1.5);
+  }
+  50% {
+    opacity: 0.8;
+    transform: perspective(800px) rotateX(68deg) scale(1.5);
+  }
+}
+
+.grid-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(
+      ellipse at 30% 40%,
+      rgba(0, 188, 212, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 60%,
+      rgba(0, 188, 212, 0.12) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(10, 15, 30, 0.8) 60%,
+      rgba(10, 15, 30, 1) 100%
+    );
+  animation: glowShift 10s ease-in-out infinite;
+}
+
+@keyframes glowShift {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* About Button */
+.about-button {
+  position: fixed;
+  top: 30px;
+  left: 30px;
+  background: transparent;
+  border: 2px solid #00bcd4;
+  color: #00bcd4;
+  padding: 10px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.about-button:hover {
+  background: rgba(0, 188, 212, 0.1);
+  box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
+}
+
+/* Main Content */
+.main-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 70px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 
+    0 0 20px rgba(0, 188, 212, 0.6),
+    0 0 40px rgba(0, 188, 212, 0.4),
+    0 0 60px rgba(0, 188, 212, 0.2);
+}
+
+.subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  max-width: 900px;
+  line-height: 1.6;
+  margin-bottom: 80px;
+}
+
+/* Upload Cards Container */
+.upload-cards {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+  max-width: 1100px;
+  justify-content: center;
+}
+
+/* Individual Upload Card */
+.upload-card {
+  flex: 1;
+  max-width: 500px;
+  background: rgba(10, 20, 35, 0.6);
+  border: 2px solid #00bcd4;
+  border-radius: 16px;
+  padding: 40px 35px;
+  box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.upload-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 40px rgba(0, 188, 212, 0.6);
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #00bcd4;
+  text-transform: uppercase;
+  margin-bottom: 25px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Select Button */
+.select-button {
+  width: 100%;
+  background: rgba(200, 210, 220, 0.95);
+  color: #0d4d5c;
+  border: none;
+  padding: 16px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 25px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.select-button:hover {
+  background: rgba(220, 230, 240, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Description */
+.card-description {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-description p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.description-highlight {
+  color: #00bcd4 !important;
+  font-weight: 500;
+  font-size: 14px !important;
+}
+
+.description-note {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Creatinine Input Styles */
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+.creatinine-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(0, 188, 212, 0.3);
+  color: #ffffff;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.creatinine-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.creatinine-input:focus {
+  border-color: #00bcd4;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 15px rgba(0, 188, 212, 0.3);
+}
+
+.unit-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #00bcd4;
+  min-width: 50px;
+}
+
+/* Submit Button */
+.submit-button {
+  margin-top: 40px;
+  background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+  color: #ffffff;
+  border: none;
+  padding: 18px 60px;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  box-shadow: 
+    0 6px 20px rgba(0, 188, 212, 0.4),
+    0 0 30px rgba(0, 188, 212, 0.2);
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 10px 30px rgba(0, 188, 212, 0.6),
+    0 0 50px rgba(0, 188, 212, 0.4);
+  background: linear-gradient(135deg, #00d4e6 0%, #00bcd4 100%);
+}
+
+.submit-button:active {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 5px 15px rgba(0, 188, 212, 0.5),
+    0 0 30px rgba(0, 188, 212, 0.3);
+}
+
+/* File Upload Indicator */
+.file-upload-indicator {
+  background: rgba(0, 188, 212, 0.1);
+  border: 2px solid rgba(0, 188, 212, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.indicator-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.check-icon {
+  flex-shrink: 0;
+}
+
+.indicator-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #00bcd4;
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-item {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #00bcd4;
+}
+
+.file-name {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  word-break: break-all;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .upload-cards {
+    flex-direction: column;
+    align-items: center;
+    max-width: 550px;
+  }
+
+  .upload-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 80px;
+  }
+
+  .title {
+    font-size: 36px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    padding: 0 20px;
+  }
+
+  .about-button {
+    top: 20px;
+    left: 20px;
+    padding: 8px 20px;
+    font-size: 12px;
+  }
+
+  .upload-card {
+    padding: 30px 25px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .select-button {
+    padding: 14px 25px;
+    font-size: 13px;
+  }
+}
