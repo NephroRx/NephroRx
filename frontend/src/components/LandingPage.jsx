@@ -30,16 +30,22 @@ const LandingPage = () => {
     const formData = new FormData();
     
     // Add all uploaded files
-    uploadedFiles.forEach((file) => {
-      formData.append('medical_images', file);
-    });
+    if (uploadedFiles.length === 1) {
+      // Single file - use 'file' field for NIfTI
+      formData.append('file', uploadedFiles[0]);
+    } else {
+      // Multiple files - use 'dicom_files' for DICOM series
+      uploadedFiles.forEach((file) => {
+        formData.append('dicom_files', file);
+      });
+    }
     
-    // Add creatinine value
-    formData.append('creatinine', creatinine);
+    // Add creatinine value (backend expects 'creatinine_mg_dl')
+    formData.append('creatinine_mg_dl', creatinine || '1.0');
     
     // Send to backend API
     try {
-      const response = await fetch('http://localhost:5000/api/process', {
+      const response = await fetch('http://localhost:5000/analyze', {
         method: 'POST',
         body: formData,
       });

@@ -19,27 +19,55 @@ def convert_dicom_to_nifti(dicom_dir, output_dir):
         raise RuntimeError(f"Failed to convert DICOM to NIfTI: {str(e)}")
     
 def run_ai_model(input_nifti_path, output_dir):
-    output_filename = "segmentation.nii.gz"
-    output_path = os.path.join(output_dir, output_filename)
-
-    if os.path.exists(output_path):
-        os.remove(output_path)
+    import time
+    import shutil
     
-    cmd = [
-        "TotalSegmentator",
-        "--input", input_nifti_path,
-        "--output", output_path,
-        "--roi_subset", "kidney_right",
-        "--fast"
-    ]
-
+    # TotalSegmentator creates a directory for outputs, not a single file
+    timestamp = int(time.time())
+    seg_output_dir = os.path.join(output_dir, f"segmentation_{timestamp}")
+    
+    # Remove old directory if it exists
+    if os.path.exists(seg_output_dir):
+        try:
+            shutil.rmtree(seg_output_dir)
+        except Exception as e:
+            print(f"Could not remove old segmentation directory: {e}")
+    
+    # Try to import TotalSegmentator as a Python module first
     try:
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError:
-        raise RuntimeError("AI Segmentation failed.")
-
-    if not os.path.exists(output_path):
-        raise FileNotFoundError("AI Segmentation output file not created.")
-    
-    return output_path
+        from totalsegmentator.python_api import totalsegmentator
+        
+        print(f"Running TotalSegmentator on: {input_nifti_path}")
+        print(f"Output directory: {seg_output_dir}")
+        
+        totalsegmentator(
+            input=input_nifti_path,
+            output=seg_output_dir,
+            roi_subset=["kidney_right"],
+            fast=True
+        )
+        
+        # TotalSegmentator creates individual files for each ROI
+        # Look for the kidney_right output file
+        kidney_file = os.path.join(seg_output_dir, "kidney_right.nii.gz")
+        
+        if os.path.exists(kidney_file):
+            print(f"Segmentation successful: {kidney_file}")
+            return kidney_file
+        else:
+            # List what files were created
+            if os.path.exists(seg_output_dir):
+                files = os.listdir(seg_output_dir)
+                print(f"Files created: {files}")
+                if files:
+                    # Return the first file found
+                    return os.path.join(seg_output_dir, files[0])
+            raise FileNotFoundError("AI Segmentation output file not created.")
+        
+    except ImportError as e:
+        print(f"Could not import TotalSegmentator Python API: {e}")
+        raise RuntimeError("TotalSegmentator Python API not available. Please reinstall totalsegmentator.")
+    except Exception as e:
+        print(f"Error during segmentation: {e}")
+        raise RuntimeError(f"AI Segmentation failed: {str(e)}")
     
