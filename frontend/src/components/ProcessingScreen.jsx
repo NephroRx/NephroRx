@@ -7,7 +7,7 @@ const ProgressStep = ({ label, status }) => {
       <div className="step-indicator">
         {status === 'complete' && (
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8l3 3 7-7" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3 8l3 3 7-7" stroke="#8B7462" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
         {status === 'active' && (
@@ -26,10 +26,9 @@ const ProcessingScreen = ({ onComplete }) => {
   const [analysisStage, setAnalysisStage] = useState(-1);
 
   const stages = [
-    { name: 'Image Processing', duration: 800 },
-    { name: 'AI Segmentation', duration: 2100 },
-    { name: 'Volumetric Analysis', duration: 500 },
-    { name: 'Dose Calculation', duration: 300 }
+    { name: 'Image Processing', duration: 1000 },
+    { name: 'Calculating Volume', duration: 2000 },
+    { name: 'Loading 3D Model', duration: 2500 }
   ];
 
   useEffect(() => {
@@ -84,28 +83,24 @@ const ProcessingScreen = ({ onComplete }) => {
               status={analysisStage >= 0 ? (analysisStage > 0 ? 'complete' : 'active') : 'pending'}
             />
             <ProgressStep 
-              label="AI Segmentation" 
+              label="Calculating Volume" 
               status={analysisStage >= 1 ? (analysisStage > 1 ? 'complete' : 'active') : 'pending'}
             />
             <ProgressStep 
-              label="Volumetric Analysis" 
-              status={analysisStage >= 2 ? (analysisStage > 2 ? 'complete' : 'active') : 'pending'}
-            />
-            <ProgressStep 
-              label="Dose Calculation" 
-              status={analysisStage >= 3 ? 'complete' : (analysisStage === 3 ? 'active' : 'pending')}
+              label="Loading 3D Model" 
+              status={analysisStage === 2 ? 'active' : 'pending'}
             />
           </div>
 
           <div className="ai-progress-section">
             <div className="ai-progress-header">
               <span className="ai-model-label">AI Model: TotalSegmentator v2.0</span>
-              <span className="ai-percentage">{Math.round(((analysisStage + 1) / 4) * 100)}%</span>
+              <span className="ai-percentage">{Math.round(((analysisStage + 1) / 3) * 100)}%</span>
             </div>
             <div className="ai-progress-bar-bg">
               <div 
                 className="ai-progress-bar-fill"
-                style={{ width: `${((analysisStage + 1) / 4) * 100}%` }}
+                style={{ width: `${((analysisStage + 1) / 3) * 100}%` }}
               />
             </div>
           </div>
