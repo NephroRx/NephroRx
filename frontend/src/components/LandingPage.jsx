@@ -28,46 +28,43 @@ const LandingPage = () => {
   };
 
   const handleSubmit = async () => {
-  const formData = new FormData();
-
-  uploadedFiles.forEach((file) => {
-    const lower = file.name.toLowerCase();
-
-    if (lower.endsWith('.dcm')) {
-      // These must be segmented by AI model
-      formData.append('dicom_files', file);
-    } else if (lower.endsWith('.nii') || lower.endsWith('.nii.gz')) {
-      // Already segmented OR NIfTI volume
-      formData.append('file', file);
-    }
-  });
-
-  // Add creatinine
-  formData.append('creatinine_mg_dl', creatinine);
-
-  try {
-    const response = await fetch('http://localhost:5000/analyze', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Backend response:', data);
-      setResultData(data);
-      setShowResults(true);
-
+    // Create FormData to send files to backend
+    const formData = new FormData();
+    
+    // Add all uploaded files
+    if (uploadedFiles.length === 1) {
+      // Single file - use 'file' field for NIfTI
+      formData.append('file', uploadedFiles[0]);
     } else {
-      console.error('Upload failed:', response.statusText);
-      alert('Failed to upload files. Please try again.');
+      // Multiple files - use 'dicom_files' for DICOM series
+      uploadedFiles.forEach((file) => {
+        formData.append('dicom_files', file);
+      });
     }
-  } catch (error) {
-    console.error('Error uploading files:', error);
-    alert('Error connecting to server. Please ensure the backend is running.');
-  }
-};
-
-
+    
+    // Add creatinine value (backend expects 'creatinine_mg_dl')
+    formData.append('creatinine_mg_dl', creatinine || '1.0');
+    
+    // Send to backend API
+    try {
+      const response = await fetch('http://localhost:5000/analyze', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Backend response:', data);
+        setIsProcessing(true);
+      } else {
+        console.error('Upload failed:', response.statusText);
+        alert('Failed to upload files. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('Error connecting to server. Please ensure the backend is running.');
+    }
+  };
 
   const handleProcessingComplete = () => {
     setIsProcessing(false);
