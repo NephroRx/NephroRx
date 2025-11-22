@@ -1,6 +1,8 @@
 import os
 import subprocess
 import dicom2nifti
+import nibabel as nib
+import numpy as np
 
 def convert_dicom_to_nifti(dicom_dir, output_dir):
     try:
@@ -18,7 +20,23 @@ def convert_dicom_to_nifti(dicom_dir, output_dir):
     except Exception as e:
         raise RuntimeError(f"Failed to convert DICOM to NIfTI: {str(e)}")
     
+
 def run_ai_model(input_nifti_path, output_dir):
+    """
+    Runs TotalSegmentator unless the input NIfTI is already a segmentation mask.
+    """
+    # Check if already segmented
+    nii = nib.load(input_nifti_path)
+    data = nii.get_fdata()
+
+    unique_vals = np.unique(data)
+
+    # Heuristic: segmentation masks have very few unique values (0, 1, 2)
+    if len(unique_vals) < 10:
+        print("⚠️ Detected segmentation mask — skipping TotalSegmentator.")
+        return input_nifti_path  # Use file directly
+
+    # Not a mask → run full segmentation
     output_filename = "segmentation.nii.gz"
     output_path = os.path.join(output_dir, output_filename)
 
@@ -42,4 +60,3 @@ def run_ai_model(input_nifti_path, output_dir):
         raise FileNotFoundError("AI Segmentation output file not created.")
     
     return output_path
-    

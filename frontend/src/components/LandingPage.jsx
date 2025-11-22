@@ -11,6 +11,8 @@ const LandingPage = () => {
   const [showResults, setShowResults] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [creatinine, setCreatinine] = useState('');
+  const [resultData, setResultData] = useState(null);
+
 
   const handleNiftiClick = () => {
     niftiInputRef.current?.click();
@@ -26,46 +28,56 @@ const LandingPage = () => {
   };
 
   const handleSubmit = async () => {
-    // Create FormData to send files to backend
-    const formData = new FormData();
-    
-    // Add all uploaded files
-    uploadedFiles.forEach((file) => {
-      formData.append('medical_images', file);
-    });
-    
-    // Add creatinine value
-    formData.append('creatinine', creatinine);
-    
-    // Send to backend API
-    try {
-      const response = await fetch('http://localhost:5000/api/process', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Backend response:', data);
-        setIsProcessing(true);
-      } else {
-        console.error('Upload failed:', response.statusText);
-        alert('Failed to upload files. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      alert('Error connecting to server. Please ensure the backend is running.');
+  const formData = new FormData();
+
+  uploadedFiles.forEach((file) => {
+    const lower = file.name.toLowerCase();
+
+    if (lower.endsWith('.dcm')) {
+      // These must be segmented by AI model
+      formData.append('dicom_files', file);
+    } else if (lower.endsWith('.nii') || lower.endsWith('.nii.gz')) {
+      // Already segmented OR NIfTI volume
+      formData.append('file', file);
     }
-  };
+  });
+
+  // Add creatinine
+  formData.append('creatinine_mg_dl', creatinine);
+
+  try {
+    const response = await fetch('http://localhost:5000/analyze', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Backend response:', data);
+      setResultData(data);
+      setShowResults(true);
+
+    } else {
+      console.error('Upload failed:', response.statusText);
+      alert('Failed to upload files. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    alert('Error connecting to server. Please ensure the backend is running.');
+  }
+};
+
+
 
   const handleProcessingComplete = () => {
     setIsProcessing(false);
     setShowResults(true);
   };
 
-  if (showResults) {
-    return <ResultsPage />;
+  if (showResults && resultData) {
+    return <ResultsPage result={resultData} />;
   }
+
 
   if (isProcessing) {
     return <ProcessingScreen onComplete={handleProcessingComplete} />;
@@ -95,7 +107,7 @@ const LandingPage = () => {
             <input
               ref={niftiInputRef}
               type="file"
-              accept=".nii,.nii.gz,.dcm"
+              accept=".nii,.gz,.dcm,application/gzip"
               multiple
               onChange={handleNiftiChange}
               style={{ display: 'none' }}
