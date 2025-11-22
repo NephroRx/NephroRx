@@ -1,8 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import './LandingPage.css';
+import AboutPage from './AboutPage';
+import ProcessingScreen from './ProcessingScreen';
+import ResultsPage from './ResultsPage';
 
 const LandingPage = () => {
   const niftiInputRef = useRef(null);
+  const [showAbout, setShowAbout] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const handleNiftiClick = () => {
     niftiInputRef.current?.click();
@@ -11,14 +18,35 @@ const LandingPage = () => {
   const handleNiftiChange = (event) => {
     const files = event.target.files;
     if (files && files.length > 0) {
+      const fileList = Array.from(files).map(file => file.name);
+      setUploadedFiles(fileList);
       console.log('Files selected:', files.length);
       // Process files (NIfTI or DICOM)
     }
   };
 
+  const handleSubmit = () => {
+    setIsProcessing(true);
+  };
+
+  const handleProcessingComplete = () => {
+    setIsProcessing(false);
+    setShowResults(true);
+  };
+
+  if (showResults) {
+    return <ResultsPage />;
+  }
+
+  if (isProcessing) {
+    return <ProcessingScreen onComplete={handleProcessingComplete} />;
+  }
+
   return (
     <div className="app-container">
-      <button className="about-button">About</button>
+      {showAbout && <AboutPage onClose={() => setShowAbout(false)} />}
+      
+      <button className="about-button" onClick={() => setShowAbout(true)}>About</button>
 
       <div className="grid-background"></div>
 
@@ -29,6 +57,47 @@ const LandingPage = () => {
         </p>
 
         <div className="upload-cards">
+          {/* File Upload Card */}
+          <div className="upload-card">
+            <h2 className="card-title">Upload Medical Images</h2>
+            <button className="select-button" onClick={handleNiftiClick}>
+              Select Files
+            </button>
+            <input
+              ref={niftiInputRef}
+              type="file"
+              accept=".nii,.nii.gz,.dcm"
+              multiple
+              onChange={handleNiftiChange}
+              style={{ display: 'none' }}
+            />
+            
+            {uploadedFiles.length > 0 && (
+              <div className="file-upload-indicator">
+                <div className="indicator-header">
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="9" fill="#00bcd4" opacity="0.2"/>
+                    <path d="M6 10l3 3 5-6" stroke="#00bcd4" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span className="indicator-title">{uploadedFiles.length} file{uploadedFiles.length > 1 ? 's' : ''} uploaded</span>
+                </div>
+                <div className="file-list">
+                  {uploadedFiles.map((fileName, index) => (
+                    <div key={index} className="file-item">
+                      <span className="file-name">{fileName}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="card-description">
+              <p className="description-highlight">NIfTI (.nii, .nii.gz) or DICOM (.dcm)</p>
+              <p>Upload streamlined de-identified MRI volumes or raw scanner output with full metadata</p>
+              <p className="description-note">Supports multiple file formats for maximum flexibility</p>
+            </div>
+          </div>
+
           {/* Creatinine Input Card */}
           <div className="upload-card">
             <h2 className="card-title">Serum Creatinine Level</h2>
@@ -48,30 +117,9 @@ const LandingPage = () => {
               <p className="description-note">Typical range: 0.6-1.2 mg/dL</p>
             </div>
           </div>
-
-          {/* File Upload Card */}
-          <div className="upload-card">
-            <h2 className="card-title">Upload Medical Images</h2>
-            <button className="select-button" onClick={handleNiftiClick}>
-              Select Files
-            </button>
-            <input
-              ref={niftiInputRef}
-              type="file"
-              accept=".nii,.nii.gz,.dcm"
-              multiple
-              onChange={handleNiftiChange}
-              style={{ display: 'none' }}
-            />
-            <div className="card-description">
-              <p className="description-highlight">NIfTI (.nii, .nii.gz) or DICOM (.dcm)</p>
-              <p>Upload streamlined de-identified MRI volumes or raw scanner output with full metadata</p>
-              <p className="description-note">Supports multiple file formats for maximum flexibility</p>
-            </div>
-          </div>
         </div>
 
-        <button className="submit-button">
+        <button className="submit-button" onClick={handleSubmit}>
           Process & Analyze
         </button>
       </main>

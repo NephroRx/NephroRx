@@ -327,6 +327,63 @@
     0 0 30px rgba(0, 188, 212, 0.3);
 }
 
+/* File Upload Indicator */
+.file-upload-indicator {
+  background: rgba(0, 188, 212, 0.1);
+  border: 2px solid rgba(0, 188, 212, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.indicator-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.check-icon {
+  flex-shrink: 0;
+}
+
+.indicator-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #00bcd4;
+}
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-item {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #00bcd4;
+}
+
+.file-name {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  word-break: break-all;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .upload-cards {
