@@ -1,0 +1,10 @@
+# ignore virtual environments
+venv/
+backend/venv/
+
+# ignore huge medical files
+*.nii
+*.nii.gz
+*.dcm
+backend/nii/
+
