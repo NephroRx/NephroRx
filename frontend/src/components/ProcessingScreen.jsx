@@ -7,7 +7,7 @@ const ProgressStep = ({ label, status }) => {
       <div className="step-indicator">
         {status === 'complete' && (
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8l3 3 7-7" stroke="#00bcd4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M3 8l3 3 7-7" stroke="#8B7462" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
         {status === 'active' && (
