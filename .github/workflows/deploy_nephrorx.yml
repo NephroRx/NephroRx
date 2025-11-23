@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.14'
 
       # Just package the backend folder; no pip install here.
       - name: Create deployment package (backend)
@@ -62,3 +62,4 @@ jobs:
           app-name: 'NephroRx'
           slot-name: 'Production'
           package: backend.zip
+
