@@ -13,7 +13,13 @@ ALLOWED_ORIGINS = {
     "https://nephrorx.app",
 }
 
-CORS(app, resources={r"/*": {"origins": list(ALLOWED_ORIGINS)}}, supports_credentials=True)
+CORS(
+    app,
+    origins=list(ALLOWED_ORIGINS),
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"],
+)
 
 
 @app.after_request
@@ -30,6 +36,16 @@ def add_cors_headers(response):
     else:
         response.headers.setdefault("Access-Control-Allow-Origin", "*")
     return response
+
+
+@app.route("/analyze", methods=["OPTIONS"])
+def analyze_preflight():
+    return "", 204
+
+
+@app.route("/analyze_structural", methods=["OPTIONS"])
+def analyze_structural_preflight():
+    return "", 204
 
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
