@@ -6,20 +6,13 @@ import processing
 import calculations
 
 app = Flask(__name__)
-# Explicit list of frontends that are allowed to talk to the API
-ALLOWED_ORIGINS = {
+app = Flask(__name__)
+allowed_origins = [
     "http://localhost:3000",
     "https://www.nephrorx.app",
-    "https://nephrorx.app",
-}
-
-CORS(
-    app,
-    origins=list(ALLOWED_ORIGINS),
-    supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "OPTIONS"],
-)
+    "https://nephrorx.app"
+]
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.after_request
