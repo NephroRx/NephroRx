@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import AboutButton from "./About.jsx";
 import ProcessingScreen from "./ProcessingScreen.jsx";
 
+const API_BASE_URL = "https://nephrorx-d06x.onrender.com";
+
 export default function NephroRX() {
   const [scrolled, setScrolled] = useState(0);
   const [showForm, setShowForm] = useState(false);
@@ -42,7 +44,7 @@ export default function NephroRX() {
     uploadData.append("creatinine_mg_dl", formData.creatinine || "1.0");
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/analyze`, {
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: "POST",
         body: uploadData,
       });

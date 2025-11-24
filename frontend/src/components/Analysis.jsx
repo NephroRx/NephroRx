@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, ChevronDown, Activity } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+const API_BASE_URL = "https://nephrorx-d06x.onrender.com";
+
 export default function AnalysisPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ export default function AnalysisPage() {
     async function fetchStructural() {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/analyze_structural`,
+          `${API_BASE_URL}/analyze_structural`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
