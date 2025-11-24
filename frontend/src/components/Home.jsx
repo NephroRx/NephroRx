@@ -20,6 +20,25 @@ export default function NephroRX() {
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
+  const handleUseSampleFile = async () => {
+    try {
+      const response = await fetch('/sample/sample_kidney_scan.nii.gz');
+      const blob = await response.blob();
+      const file = new File([blob], 'sample_kidney_scan.nii.gz', { type: 'application/gzip' });
+      
+      setFormData({
+        age: "45",
+        sex: "male",
+        weight: "75",
+        creatinine: "1.2",
+        file: file
+      });
+    } catch (error) {
+      console.error('Error loading sample file:', error);
+      alert('Failed to load sample file');
+    }
+  };
+
   const handleSubmit = async () => {
     if (!formData.file) {
       alert("Please upload a file.");
@@ -349,6 +368,14 @@ export default function NephroRX() {
                       {formData.file.name}
                     </p>
                   )}
+                  
+                  <button
+                    onClick={handleUseSampleFile}
+                    type="button"
+                    className="mt-4 text-xs text-[#8B7462] hover:text-[#9d8270] transition-colors uppercase tracking-widest underline"
+                  >
+                    Or use sample scan for testing
+                  </button>
                 </div>
 
                 <button
