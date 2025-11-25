@@ -6,26 +6,25 @@ import processing
 import calculations
 
 app = Flask(__name__)
-app = Flask(__name__)
+
 allowed_origins = [
     "http://localhost:3000",
     "https://www.nephrorx.app",
     "https://nephrorx.app"
 ]
-CORS(app, resources={r"/*": {"origins": "*"}})
 
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route("/analyze", methods=["OPTIONS"])
 def analyze_preflight():
     return "", 204
 
-
 @app.route("/analyze_structural", methods=["OPTIONS"])
 def analyze_structural_preflight():
     return "", 204
 
-UPLOAD_FOLDER = 'uploads'
-PROCESSED_FOLDER = 'processed'
+UPLOAD_FOLDER = "uploads"
+PROCESSED_FOLDER = "processed"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
@@ -53,9 +52,9 @@ def analyze_structural():
             return jsonify({"error": "Face array cannot reshape to Nx3"}), 400
 
         verts = np.array(vertices, dtype=float).reshape(-1, 3)
-        faces = np.array(faces, dtype=int).reshape(-1, 3)
+        faces_arr = np.array(faces, dtype=int).reshape(-1, 3)
 
-        rough = calculations.calculate_roughness(verts, faces)
+        rough = calculations.calculate_roughness(verts, faces_arr)
 
         if rough < 1.2:
             rough_label = "Low irregularity, smooth structure less likely tumor."
@@ -64,7 +63,7 @@ def analyze_structural():
         else:
             rough_label = "High structural irregularity, considerably a tumor or abnormal growth."
 
-        curvature_info = calculations.compute_curvature_variability(verts, faces)
+        curvature_info = calculations.compute_curvature_variability(verts, faces_arr)
 
         cvi = float(curvature_info["curvature_variability_index"])
         mean_curv = float(curvature_info["mean_curvature"])
@@ -100,8 +99,8 @@ def analyze():
     try:
         input_path = ""
 
-        if 'dicom_files' in request.files:
-            files = request.files.getlist('dicom_files')
+        if "dicom_files" in request.files:
+            files = request.files.getlist("dicom_files")
             for f in files:
                 f.save(os.path.join(UPLOAD_FOLDER, f.filename))
 
@@ -109,8 +108,8 @@ def analyze():
                 UPLOAD_FOLDER, PROCESSED_FOLDER
             )
 
-        elif 'file' in request.files:
-            f = request.files['file']
+        elif "file" in request.files:
+            f = request.files["file"]
             input_path = os.path.join(UPLOAD_FOLDER, f.filename)
             f.save(input_path)
         else:
@@ -125,4 +124,5 @@ def analyze():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
