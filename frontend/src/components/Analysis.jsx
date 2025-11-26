@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, ChevronDown, Activity } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "/api";
 
 export default function AnalysisPage() {
   const location = useLocation();
