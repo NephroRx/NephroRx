@@ -101,6 +101,7 @@ def analyze():
 
         if "dicom_files" in request.files:
             files = request.files.getlist("dicom_files")
+            print(f"Received {len(files)} DICOM files")
             for f in files:
                 f.save(os.path.join(UPLOAD_FOLDER, f.filename))
 
@@ -110,17 +111,28 @@ def analyze():
 
         elif "file" in request.files:
             f = request.files["file"]
+            print(f"Received file: {f.filename}")
             input_path = os.path.join(UPLOAD_FOLDER, f.filename)
             f.save(input_path)
+            print(f"File saved to: {input_path}")
         else:
+            print("ERROR: No file in request.files")
+            print(f"Request.files keys: {list(request.files.keys())}")
+            print(f"Request.form keys: {list(request.form.keys())}")
             return jsonify({"error": "No file uploaded"}), 400
 
+        print(f"Processing file: {input_path}")
         seg_path = processing.run_ai_model(input_path, PROCESSED_FOLDER)
         creatinine_mg_dl = float(request.form.get("creatinine_mg_dl", 1.0))
+        print(f"Running calculations with creatinine: {creatinine_mg_dl}")
         results = calculations.process_seg_file(seg_path, creatinine_mg_dl)
+        print("Analysis complete!")
         return jsonify(results)
 
     except Exception as e:
+        print(f"ERROR in analyze endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":

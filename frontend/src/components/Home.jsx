@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 import AboutButton from "./About.jsx";
 import ProcessingScreen from "./ProcessingScreen.jsx";
 
-const API_BASE_URL = "/api";
+// Use /api for production (Vercel rewrites to EC2), direct URL for development
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL 
+  ? process.env.REACT_APP_API_BASE_URL 
+  : (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000');
 
 export default function NephroRX() {
   const [scrolled, setScrolled] = useState(0);
