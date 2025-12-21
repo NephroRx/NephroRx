@@ -1,16 +1,27 @@
 services:
   api:
-    build: ./backend
-    container_name: flask_api
-    ports:
-      - "5000:5000"
-    environment:
-      - FLASK_ENV=production
+    # keep your existing build
+    expose:
+      - "5000"
 
   web:
-    build: ./frontend
-    container_name: react_web
+    # keep your existing build
+    expose:
+      - "80"
+
+  caddy:
+    image: caddy:2
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
+      - web
       - api
+
+volumes:
+  caddy_data:
+  caddy_config:
