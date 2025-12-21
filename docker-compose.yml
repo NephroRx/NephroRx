@@ -2,8 +2,6 @@ services:
   api:
     build: ./backend
     container_name: flask_api
-    ports:
-      - "5000:5000"
     environment:
       - FLASK_ENV=production
     expose:
@@ -12,8 +10,6 @@ services:
   web:
     build: ./frontend
     container_name: react_web
-    ports:
-      - "80:80"
     depends_on:
       - api
     expose:
