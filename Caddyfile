@@ -1,4 +1,9 @@
 nephrorx.app, www.nephrorx.app {
-  reverse_proxy /api/* api:5000
-  reverse_proxy web:80
+  handle_path /api/* {
+    reverse_proxy api:5000
+  }
+
+  handle {
+    reverse_proxy web:80
+  }
 }
