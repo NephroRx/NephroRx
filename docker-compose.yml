@@ -1,11 +1,21 @@
 services:
   api:
-    # keep your existing build
+    build: ./backend
+    container_name: flask_api
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
     expose:
       - "5000"
 
   web:
-    # keep your existing build
+    build: ./frontend
+    container_name: react_web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
     expose:
       - "80"
 
