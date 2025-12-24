@@ -99,7 +99,16 @@ def analyze():
     try:
         input_path = ""
 
-        if "dicom_files" in request.files:
+        # Support a server-side sample file to avoid sending large files through the browser.
+        if request.form.get("use_sample") == "true":
+            sample_path = os.path.join("samples", "segmentation.nii.gz")
+            if not os.path.exists(sample_path):
+                print(f"ERROR: Sample file not found at {sample_path}")
+                return jsonify({"error": "Sample file not found on server"}), 404
+            input_path = sample_path
+            print(f"Using server-side sample file: {input_path}")
+
+        elif "dicom_files" in request.files:
             files = request.files.getlist("dicom_files")
             print(f"Received {len(files)} DICOM files")
             for f in files:
@@ -116,10 +125,10 @@ def analyze():
             f.save(input_path)
             print(f"File saved to: {input_path}")
         else:
-            print("ERROR: No file in request.files")
+            print("ERROR: No file in request.files and no sample flag set")
             print(f"Request.files keys: {list(request.files.keys())}")
             print(f"Request.form keys: {list(request.form.keys())}")
-            return jsonify({"error": "No file uploaded"}), 400
+            return jsonify({"error": "No file uploaded or sample requested"}), 400
 
         print(f"Processing file: {input_path}")
         seg_path = processing.run_ai_model(input_path, PROCESSED_FOLDER)

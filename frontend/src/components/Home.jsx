@@ -5,9 +5,11 @@ import AboutButton from "./About.jsx";
 import ProcessingScreen from "./ProcessingScreen.jsx";
 
 // Use /api for production (Vercel rewrites to EC2), direct URL for development
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL 
-  ? process.env.REACT_APP_API_BASE_URL 
-  : (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000');
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+  ? process.env.REACT_APP_API_BASE_URL
+  : process.env.NODE_ENV === "production"
+  ? "/api"
+  : "http://localhost:5000";
 
 export default function NephroRX() {
   const [scrolled, setScrolled] = useState(0);
@@ -18,6 +20,7 @@ export default function NephroRX() {
     weight: "",
     creatinine: "",
     file: null,
+    useSample: false,
   });
   const [analyzing, setAnalyzing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -25,28 +28,21 @@ export default function NephroRX() {
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleUseSampleFile = async () => {
-    try {
-      const response = await fetch('/sample/segmentation.nii.gz');
-      const blob = await response.blob();
-      const file = new File([blob], 'segmentation.nii.gz', { type: 'application/gzip' });
-      
-      setFormData({
-        age: "45",
-        sex: "male",
-        weight: "75",
-        creatinine: "1.2",
-        file: file
-      });
-    } catch (error) {
-      console.error('Error loading sample file:', error);
-      alert('Failed to load sample file');
-    }
+  const handleUseSampleFile = () => {
+    // Mark that we want to use the server-side sample; do not download the sample into browser memory
+    setFormData({
+      age: "45",
+      sex: "male",
+      weight: "75",
+      creatinine: "1.2",
+      file: null,
+      useSample: true,
+    });
   };
 
   const handleSubmit = async () => {
-    if (!formData.file) {
-      alert("Please upload a file.");
+    if (!formData.file && !formData.useSample) {
+      alert("Please upload a file or choose the sample scan.");
       return;
     }
 
@@ -54,13 +50,18 @@ export default function NephroRX() {
     setIsProcessing(true);
     const uploadData = new FormData();
 
-    const file = formData.file;
-    const lower = file.name.toLowerCase();
-
-    if (lower.endsWith(".dcm")) {
-      uploadData.append("dicom_files", file);
+    if (formData.useSample) {
+      // Tell the server to use its own sample file so we don't hold it in memory
+      uploadData.append("use_sample", "true");
     } else {
-      uploadData.append("file", file);
+      const file = formData.file;
+      const lower = file.name.toLowerCase();
+
+      if (lower.endsWith(".dcm")) {
+        uploadData.append("dicom_files", file);
+      } else {
+        uploadData.append("file", file);
+      }
     }
 
     uploadData.append("creatinine_mg_dl", formData.creatinine || "1.0");
@@ -81,8 +82,8 @@ export default function NephroRX() {
           patientData: {
             age: formData.age,
             sex: formData.sex,
-            weight: formData.weight
-          }
+            weight: formData.weight,
+          },
         });
       } else {
         console.error("Upload failed:", response.statusText);
@@ -99,8 +100,6 @@ export default function NephroRX() {
       setAnalyzing(false);
     }
   };
-
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -373,7 +372,12 @@ export default function NephroRX() {
                       {formData.file.name}
                     </p>
                   )}
-                  
+                  {formData.useSample && (
+                    <p className="text-xs text-[#8B7462] mt-3">
+                      Using server sample: segmentation.nii.gz
+                    </p>
+                  )}
+
                   <button
                     onClick={handleUseSampleFile}
                     type="button"
