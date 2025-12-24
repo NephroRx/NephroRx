@@ -27,9 +27,9 @@ export default function NephroRX() {
 
   const handleUseSampleFile = async () => {
     try {
-      const response = await fetch('/sample/sample_kidney_scan.nii.gz');
+      const response = await fetch('/sample/segmentation.nii.gz');
       const blob = await response.blob();
-      const file = new File([blob], 'sample_kidney_scan.nii.gz', { type: 'application/gzip' });
+      const file = new File([blob], 'segmentation.nii.gz', { type: 'application/gzip' });
       
       setFormData({
         age: "45",
