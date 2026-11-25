@@ -29,7 +29,7 @@ def run_ai_model(input_nifti_path, output_dir):
 
 
     if len(unique_vals) < 10:
-        print("⚠️ Detected segmentation mask — skipping TotalSegmentator.")
+        print("Input is already a segmentation mask; skipping TotalSegmentator.")
         return input_nifti_path
     
     output_filename = "segmentation.nii.gz"

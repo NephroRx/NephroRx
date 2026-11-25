@@ -1,9 +1,24 @@
-# ignore virtual environments
+# Python
 venv/
-backend/venv/
+.venv/
+__pycache__/
+*.pyc
 
-# ignore huge medical files
+# Node / build output
+node_modules/
+build/
+
+# Secrets
+.env
+.env.local
+
+# Runtime scratch written by the API (recreated on startup)
+backend/uploads/
+backend/processed/
+
+# Medical imaging (keep out of git; only backend/samples/ is tracked)
 *.dcm
 backend/nii/
 
-backend/__pycache__/
+# Benchmark scratch
+bench/*_scratch*

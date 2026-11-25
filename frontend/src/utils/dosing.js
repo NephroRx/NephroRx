@@ -210,7 +210,5 @@ export function calculateAllDoses(patient) {
  */
 export function getDrugById(drugId) {
   const normalizedId = drugId.toLowerCase();
-  const drug = DRUG_CONFIGS.find(d => d.id === normalizedId || d.displayName.toLowerCase() === normalizedId);
-  console.log(`getDrugById: searching for "${drugId}", normalized: "${normalizedId}", found:`, drug);
-  return drug;
+  return DRUG_CONFIGS.find(d => d.id === normalizedId || d.displayName.toLowerCase() === normalizedId);
 }

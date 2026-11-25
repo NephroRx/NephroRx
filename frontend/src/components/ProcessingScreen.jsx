@@ -22,16 +22,17 @@ const ProgressStep = ({ label, status }) => {
   );
 };
 
+// Purely cosmetic progress animation; the real request runs in parallel.
+const stages = [
+  { name: 'Image Processing', duration: 1000 },
+  { name: 'Calculating Volume', duration: 2000 },
+  { name: 'Loading 3D Model', duration: 2500 }
+];
+
 const ProcessingScreen = ({ resultData, navigate }) => {
   const [analysisStage, setAnalysisStage] = useState(-1);
   const [animationComplete, setAnimationComplete] = useState(false);
   const hasNavigated = React.useRef(false);
-
-  const stages = [
-    { name: 'Image Processing', duration: 1000 },
-    { name: 'Calculating Volume', duration: 2000 },
-    { name: 'Loading 3D Model', duration: 2500 }
-  ];
 
   // Animation effect - runs only once on mount
   useEffect(() => {

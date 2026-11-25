@@ -57,33 +57,33 @@ def compute_curvature_variability(verts, faces):
 
 
 
+def mesh_volume_mm3(verts, faces):
+    """Volume of a closed triangle mesh via the divergence theorem (sum of signed tetrahedra)."""
+    a, b, c = verts[faces[:, 0]], verts[faces[:, 1]], verts[faces[:, 2]]
+    return abs(np.einsum("ij,ij->i", a, np.cross(b, c)).sum()) / 6.0
+
+
 def process_seg_file(seg_path, creatinine_mg_dl):
-    
     img = nib.load(seg_path)
-    data = img.get_fdata()
+    data = np.asanyarray(img.dataobj)
 
     try:
-        spacing = img.header.get_zooms()[:3]
-    except:
+        spacing = tuple(float(z) for z in img.header.get_zooms()[:3])
+    except Exception:
         spacing = (1.0, 1.0, 1.0)
 
-    verts, faces, normals, values = measure.marching_cubes(
-        data, 
-        level=0.5, 
-        step_size=2,
-        spacing=spacing
-    )
+    # Binarize first: meshing raw labels (tumor = 2, cyst = 3) moves the 0.5 iso-surface outward
+    # at those boundaries. Pad by one voxel so masks touching the scan edge still give a closed
+    # surface (an open mesh has no well-defined volume).
+    mask = np.pad((data > 0).astype(np.float32), 1)
 
-    volume_mm3 = 0.0
-    for face in faces:
-        p1 = verts[face[0]]
-        p2 = verts[face[1]]
-        p3 = verts[face[2]]
-    
-        v_tet = np.dot(p1, np.cross(p2, p3)) / 6.0
-        volume_mm3 += v_tet
+    # Volume from the full-resolution mesh. step_size=2 skips every other slice, which on
+    # 3-5 mm CT slices costs up to ~4.5% TKV error (see bench/README.md).
+    v_full, f_full, _, _ = measure.marching_cubes(mask, level=0.5, step_size=1, spacing=spacing)
+    vol_cm3 = mesh_volume_mm3(v_full, f_full) / 1000.0
 
-    vol_cm3 = abs(volume_mm3) / 1000.0
+    # Coarser mesh for the browser viewer (~4x fewer vertices than full resolution).
+    verts, faces, _, _ = measure.marching_cubes(mask, level=0.5, step_size=2, spacing=spacing)
 
     gfr_estimate = vol_cm3 * 0.8
     safe_creatinine = max(float(creatinine_mg_dl), 0.5) 
