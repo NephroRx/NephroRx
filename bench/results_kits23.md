@@ -1,4 +1,4 @@
-# TKV benchmark — AFTER (binarized + padded mask, full-resolution volume mesh)
+# TKV benchmark, after the fix (binarized + padded mask, full-resolution volume mesh)
 
 Command: `python bench/tkv_benchmark.py <kits23-checkout>/dataset --repeats 3`
 

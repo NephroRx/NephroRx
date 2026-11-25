@@ -4,9 +4,9 @@ What it measures
 ----------------
 For every labelled kidney mask (KiTS-style NIfTI: 0 = background, >0 = kidney/tumor/cyst):
 
-* reference TKV = (# voxels with label > 0) x voxel volume  -- the standard way TKV is
+* reference TKV = (# voxels with label > 0) x voxel volume, the standard way TKV is
   read off a ground-truth segmentation
-* NephroRx TKV  = ``calculations.process_seg_file(...)["volume_cm3"]`` -- the exact function
+* NephroRx TKV  = ``calculations.process_seg_file(...)["volume_cm3"]``, the exact function
   the ``/analyze`` endpoint calls (marching cubes, step_size=2, signed-tetrahedron volume)
 * latency       = wall-clock time of that call (NIfTI load + meshing + volume), best of N
 

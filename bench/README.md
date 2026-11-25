@@ -5,7 +5,7 @@ takes per scan.
 
 ## Method
 
-* **Data:** the first 50 cases (`case_00000`–`case_00049`) of the public
+* **Data:** the first 50 cases (`case_00000` to `case_00049`) of the public
   [KiTS23](https://github.com/neheller/kits23) kidney-tumor CT dataset (commit `c108835`). Only
   the expert ground-truth masks (`segmentation.nii.gz`) are used, not the CT images. Slice
   thickness ranges from 0.5 mm to 5 mm.
@@ -35,8 +35,8 @@ numpy 2.5, scikit-image 0.26.
 The hackathon version ran marching cubes on the raw label volume with `step_size=2`. That caused
 three errors:
 
-1. **Skipped slices.** `step_size=2` drops every other slice. On 3–5 mm CT that loses up to
-   ~4.5% of the volume. Five of the six worst cases had slices 3–5 mm thick.
+1. **Skipped slices.** `step_size=2` drops every other slice. On 3 to 5 mm CT that loses up to
+   ~4.5% of the volume. Five of the six worst cases had slices 3 to 5 mm thick.
 2. **Label values bias the surface.** At tumor (2) and cyst (3) boundaries, the 0.5 iso-surface
    sits closer to the background. Even at full resolution this inflated volume by +0.41% on
    average (+0.78% combined with skipped slices).

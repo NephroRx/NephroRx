@@ -4,10 +4,10 @@
 kidney as an interactive 3D mesh in the browser.** You upload a NIfTI mask or a DICOM series. A
 Python pipeline meshes the kidney with marching cubes and computes its volume from the mesh. It
 also scores surface roughness and curvature variability. A React + Three.js viewer renders the
-mesh next to a volume-adjusted drug-dosing calculator. Built in 3 days at a hackathon (November
-2025) by a team of three.
+mesh so you can rotate and inspect it. Built in 3 days at a hackathon (November 2025) by a team
+of three.
 
-![Results page: 3D kidney mesh with measured volume and dosing panel](docs/results.png)
+![Results page: 3D kidney mesh with measured volume](docs/results.png)
 
 ## Measured result
 
@@ -41,7 +41,6 @@ flowchart LR
 | Geometry + volume | [`backend/calculations.py`](backend/calculations.py) | Marching cubes (scikit-image), mesh volume via the divergence theorem, roughness = surface area / area of a sphere of equal volume. |
 | API | [`backend/app.py`](backend/app.py) | `POST /analyze`, `POST /analyze_structural` |
 | 3D viewer | [`frontend/src/components/KidneyModel.jsx`](frontend/src/components/KidneyModel.jsx), [`KidneyViewer.jsx`](frontend/src/components/KidneyViewer.jsx) | Builds a `BufferGeometry` from the API mesh, react-three-fiber + drei. |
-| Dosing | [`frontend/src/utils/dosing.js`](frontend/src/utils/dosing.js) | Weight-based dose scaled by measured / expected TKV. Unit-tested. |
 | Benchmark | [`bench/`](bench/) | TKV accuracy and latency against KiTS23 ground truth. |
 
 ## Run it locally
@@ -75,24 +74,19 @@ docker compose up --build
 
 Production adds Caddy for HTTPS: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`.
 
-**Tests:** `cd frontend && npm test` (dosing unit tests). CI also builds the frontend with lint
-warnings treated as errors, runs the TKV check on the sample, and runs an end-to-end Docker
-request ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+**Tests:** `cd frontend && npm test`. CI also builds the frontend with lint warnings treated as
+errors, runs the TKV check on the sample, and runs an end-to-end Docker request ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ## Limitations
 
 This is a hackathon prototype, **not a medical device**:
 
-* **The volume is accurate; the clinical numbers are not validated.** "Estimated nephron capacity"
-  (0.8 × TKV / creatinine), the dose formula, the expected-TKV model and the roughness and
-  curvature thresholds are heuristics the team invented. They are not validated against any
-  clinical data.
+* **Only the kidney volume is benchmarked.** The other metrics shown in the app, including the
+  roughness and curvature thresholds, are hackathon heuristics with no clinical validation.
 * **Raw CT segmentation is optional.** Uploading an unsegmented scan calls
   [TotalSegmentator](https://github.com/wasserth/TotalSegmentator), which is not in
   `requirements.txt` (it needs PyTorch, and a GPU to run at practical speed). It also segments
   only the right kidney (`--roi_subset kidney_right`). Segmentation masks work out of the box.
-* **The "Kidney Filtration Index" cards are empty.** The frontend reads a `kfi` field that the
-  API never returns.
 * **The hosted demo is offline.** The frontend at nephro-rx.vercel.app is up, but its backend
   server is down. Run it locally instead.
 
@@ -100,8 +94,8 @@ This is a hackathon prototype, **not a medical device**:
 
 | | Focus |
 |---|---|
-| **Bharat Jassal** | 3D visualization and imaging pipeline: DICOM/NIfTI processing, marching-cubes meshing and volume, roughness/curvature metrics, the Three.js kidney viewer, the analysis and biological-medication pages |
-| **Ben Probert** | Drug-dosing model and calculator, results page |
+| **Bharat Jassal** | Imaging pipeline and 3D visualization: DICOM/NIfTI processing, marching-cubes meshing and Total Kidney Volume, the Three.js kidney viewer |
+| **Ben Probert** | Surface analysis and app integration: roughness and curvature metrics, the Flask API, results and analysis pages |
 | **Jasjeet Singh Soor** | Landing page and upload flow, deployment (Docker, Caddy, Vercel) |
 
 Sample data and benchmark masks come from the KiTS challenge (Heller et al.). See the

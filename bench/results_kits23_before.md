@@ -1,4 +1,4 @@
-# TKV benchmark — BEFORE (original hackathon code: raw labels, step_size=2)
+# TKV benchmark, before the fix (original hackathon code: raw labels, step_size=2)
 
 Command: `python bench/tkv_benchmark.py <kits23-checkout>/dataset --repeats 3`
 
